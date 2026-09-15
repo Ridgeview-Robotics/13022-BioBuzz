@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.TeleOp;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 import com.qualcomm.robotcore.hardware.DcMotorEx;
 import com.qualcomm.robotcore.hardware.CRServo;
 
-import org.firstinspires.ftc.teamcode.Config.Constants;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.Config.Constants;
 
 @TeleOp(name="module calibration", group="Calibration")
 public class ModuleCalibrationOpMode extends LinearOpMode {

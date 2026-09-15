@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.autonomous;
+package org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.autonomous;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.command.InstantCommand;
 import com.arcrobotics.ftclib.command.RunCommand;
 import com.qualcomm.robotcore.eventloop.opmode.Autonomous;
 
-import org.firstinspires.ftc.teamcode.subsystems.SwerveDrivetrain;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.subsystems.SwerveDrivetrain;
 
 // command-based auto template, TODO: REPLACE WITH RR
 @Autonomous(name = "swerve auto example", group = "Autonomous")

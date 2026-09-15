@@ -1,7 +1,7 @@
-package org.firstinspires.ftc.teamcode.Config;
+package org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.Config;
 
 import com.acmerobotics.dashboard.config.Config;
-import org.firstinspires.ftc.teamcode.helpers.Curve;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.helpers.Curve;
 
 @Config
 public class TeleOpConfig {

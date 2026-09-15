@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.TeleOp;
 
 import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.OpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.subsystems.SwerveDrivetrain;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.subsystems.SwerveDrivetrain;
 
 @TeleOp(name = "swerve debug", group = "Debug")
 public class SwerveDebugOpMode extends OpMode {

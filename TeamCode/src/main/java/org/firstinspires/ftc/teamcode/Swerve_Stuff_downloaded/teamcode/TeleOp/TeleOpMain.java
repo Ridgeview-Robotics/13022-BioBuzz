@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.TeleOp;
+package org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.TeleOp;
 
 import com.arcrobotics.ftclib.command.CommandOpMode;
 import com.arcrobotics.ftclib.controller.PIDFController;
@@ -6,10 +6,10 @@ import com.arcrobotics.ftclib.gamepad.GamepadEx;
 import com.arcrobotics.ftclib.gamepad.GamepadKeys;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
-import org.firstinspires.ftc.teamcode.Config.SwerveConfig;
-import org.firstinspires.ftc.teamcode.Config.TeleOpConfig;
-import org.firstinspires.ftc.teamcode.helpers.SlewRateLimiter;
-import org.firstinspires.ftc.teamcode.subsystems.SwerveDrivetrain;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.Config.SwerveConfig;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.Config.TeleOpConfig;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.helpers.SlewRateLimiter;
+import org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.subsystems.SwerveDrivetrain;
 
 @TeleOp(name = "main tele", group = "Main")
 public class TeleOpMain extends CommandOpMode {

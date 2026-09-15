@@ -1,4 +1,4 @@
-package org.firstinspires.ftc.teamcode.helpers;
+package org.firstinspires.ftc.teamcode.Swerve_Stuff_downloaded.teamcode.helpers;
 
 public enum Curve {
     LINEAR {
