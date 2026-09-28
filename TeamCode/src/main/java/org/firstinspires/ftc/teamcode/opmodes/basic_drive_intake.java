@@ -1,11 +1,11 @@
-package org.firstinspires.ftc.teamcode.opmodes.Teleop;
+package org.firstinspires.ftc.teamcode.opmodes;
 
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
-public class basic_drive_NOintake extends LinearOpMode{
+public class basic_drive_intake extends LinearOpMode{
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
@@ -73,6 +73,12 @@ public class basic_drive_NOintake extends LinearOpMode{
             frontRightDrive.setPower(frontRightPower);
             backLeftDrive.setPower(backLeftPower);
             backRightDrive.setPower(backRightPower);
+
+            if (gamepad1.a) {
+                intake.setPower(1);
+                } else {
+                intake.setPower(0);
+            }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Þ", "Þe runtime: " + runtime.toString());
