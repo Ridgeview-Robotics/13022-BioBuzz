@@ -71,6 +71,23 @@ being Will is probably the best way to do this*/
             heldSuffix = null;
         }
     }
+    // (added) D-pad controls: up/down = teeter side, left/right = made/missed
+    // we can adjust these later ;-;
+    private boolean lastUp, lastDown, lastLeft, lastRight;
+
+    public void handleButtons(Gamepad g) {
+        // Only fire once per press, not on every loop while the button is held
+        if (g.dpad_up && !lastUp) setTeeterSide("left");     // left side is UP
+        if (g.dpad_down && !lastDown) setTeeterSide("right"); // right side is UP
+        if (g.dpad_left && !lastLeft) markResult(true);       // made the shot
+        if (g.dpad_right && !lastRight) markResult(false);    // missed the shot
+        lastUp = g.dpad_up;
+        lastDown = g.dpad_down;
+        lastLeft = g.dpad_left;
+        lastRight = g.dpad_right;
+    }
+
+    public String getTeeterSide() { return teeterSide; }
 
     public void update(Gamepad gamepad1, double x, double y, double headingRad,
                        double turretDeg, double flywheelSpeed, double flywheelAngleDeg) {
