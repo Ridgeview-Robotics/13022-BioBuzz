@@ -20,14 +20,14 @@ public class DrivingDataLogger {
     private int rowsSinceFlush = 0;
 
     private boolean shotPending = false;
-    // (added) A fired shot's row is held back until you label it hit/miss
+    // A fired shot's row is held back until you label it hit/miss so that it doesn't log it incorrectly
     private String heldPrefix = null, heldSuffix = null;
 
     private String team = "red";
     private String gameState = "start_teleop";
     private String teeterSide = "unknown";
 
-    // (added) Edge detection for gamepad 2 buttons, so each press counts once
+    // Edge detection for gamepad 2 buttons, so each press only counts once
     private boolean lastUp, lastDown, lastLeft, lastRight, lastLb, lastRb;
 
     public DrivingDataLogger(String driverName) {
@@ -67,7 +67,7 @@ being Will. The option is now in the OpMode: press A in init_loop (on gamepad 1 
 
     /**  Gamepad 2 = the person logging. Gamepad 1 stays with the driver.
      *  D-pad up = left side of teeter-totter is UP, D-pad down = right side is UP,
-     *  D-pad left = last shot made, D-pad right = last shot missed,
+     *  D-pad left = last shot made ✓, D-pad right = last shot missed,
      *  left bumper = team red, right bumper = team blue. */
     public void handleButtons(Gamepad g2) {
         if (g2.dpad_up && !lastUp) setTeeterSide("left");
@@ -90,7 +90,7 @@ being Will. The option is now in the OpMode: press A in init_loop (on gamepad 1 
         shotPending = true;
     }
 
-    /** (added) Call when you know the result (handleButtons does this for you with the d-pad). */
+    /** Call when you know the result (handleButtons does this for you with the d-pad). */
     public void markResult(boolean hit) {
         if (heldPrefix != null) {
             writeRow(heldPrefix, hit ? "1" : "0", heldSuffix);
