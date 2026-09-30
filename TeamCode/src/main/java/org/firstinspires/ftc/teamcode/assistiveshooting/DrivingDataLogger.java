@@ -29,7 +29,7 @@ public class DrivingDataLogger {
             writer = null;
         }
     }
-/*IMPORTANT: IF WILL(our real driver) IS ACTUALLY THE ONE DRIVING ADD THIS LINE IN THE CODE SOMEWHERE
+/*!!!IMPORTANT!!!: IF WILL (our real driver) IS ACTUALLY THE ONE DRIVING ADD THIS LINE IN THE CODE SOMEWHERE
 This make it so others can drive but not affect my AI. adding an option to make it upon startup run as
 being Will is probably the best way to do this*/
     // logger = new DrivingDataLogger("Willheham");
@@ -70,6 +70,7 @@ being Will is probably the best way to do this*/
                         + (shotPending ? 1 : 0) + "\n");
                 shotPending = false;
                 //This gets around some errors it may throw for the amount of data that can be written, not a huge deal
+                // But please don't remove!!  >:(
                 if (++rowsSinceFlush >= 50) {
                     writer.flush();
                     rowsSinceFlush = 0;
@@ -88,17 +89,17 @@ being Will is probably the best way to do this*/
 }
 /* Ok so plain and simple talk down here rq. This code is technically a subsystem but the folder isn't there
 * which is ok. This has a bunch of functions that just need to be implemented into the code whenever we would
-* press a button where it will log it. Additionally id lake it if you could add a thing that exports a stae
+* press a button where it will log it. Additionaly, id like it if you could add a thing that exports a state
 * (ie: endgame, begin teleop, ect) this would more accurately let the AI group data that will flow better together
 * AND im gonna try and make code that can detect what side of the teeter-totter is up or down. (for testing can be manual)
 * !!!IMPORTANT!!! Please also export the team side we are "training as so the bot doesn't shoot wrong" (ill add a spot for that)
 *  !!!ALSO!!! we need to make sure to export this driving data via
 * a website but ill probably be the one who is doing all the stuff with Will so this shouldn't be
-* a huge problem..... this is definitely forshadowing */
+* a huge problem..... this is definitely forshadowing  ;-;  */
 
-/*So here is all the stuff that needs to be done:
+/*So here is all the stuff that needs to be done in the op-mode (!NOT AUTO!):
  in init:
-logger = new DrivingDataLoggerSubsystem(localizer, "Willheham"); <-Only if Will was the one driving
+logger = new DrivingDataLoggerSubsystem(localizer, "Willheham"); <-!Only if Will was the one driving!
 
 in the loop:
 logger.update(gamepad1, turretAngleDeg, flywheelSpeed);
