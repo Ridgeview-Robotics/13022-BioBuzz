@@ -1,4 +1,5 @@
 package org.firstinspires.ftc.teamcode.assistiveshooting;
+import org.firstinspires.ftc.teamcode.assistiveshooting.DrivingDataLogger;
 import android.os.Environment;
 
 import com.qualcomm.robotcore.hardware.Gamepad;
@@ -26,6 +27,9 @@ public class DrivingDataLogger {
     private String gameState = "start_teleop";
     private String teeterSide = "unknown";
 
+    // (added) Edge detection for gamepad 2 buttons, so each press counts once
+    private boolean lastUp, lastDown, lastLeft, lastRight, lastLb, lastRb;
+
     public DrivingDataLogger(String driverName) {
         sessionId = driverName + "_" + System.currentTimeMillis();
         try {
@@ -41,20 +45,43 @@ public class DrivingDataLogger {
     }
 /*!!!IMPORTANT!!!: IF WILL (our real driver) IS ACTUALLY THE ONE DRIVING ADD THIS LINE IN THE CODE SOMEWHERE
 This make it so others can drive but not affect my AI. adding an option to make it upon startup run as
-being Will is probably the best way to do this*/
-    // The option is now in the OpMode: press A in init_loop to say Will is driving. See usage at the bottom.
+being Will. The option is now in the OpMode: press A in init_loop (on gamepad 1 before start after init)
+ to say Will is driving. See usage at the bottom.
+ */
 
-    // Context setters: call these whenever the values change
+    //Context setters: call these whenever the values change
     public void setTeam(String t) { team = t.toLowerCase(); }              // "red" or "blue"
-    public void setTeeterSide(String s) { teeterSide = s.toLowerCase(); }  // manual for now
+    public void setTeeterSide(String s) { teeterSide = s.toLowerCase(); }  // "left" or "right" = which side is UP
     public void setGameState(String s) { gameState = s; }                  // start_teleop, mid_teleop, late_teleop, endgame
 
-    /** Optional automatic game state. Pass seconds since teleop started. (not perfectly working)*/
+    public String getTeam() { return team; }
+    public String getTeeterSide() { return teeterSide; }
+
+    /** Optional automatic game state. Pass seconds since teleop started. */
     public void setGameStateFromTime(double teleopSeconds) {
         if (teleopSeconds < 30) gameState = "start_teleop";
         else if (teleopSeconds < 60) gameState = "mid_teleop";
         else if (teleopSeconds < 90) gameState = "late_teleop";
         else gameState = "endgame";
+    }
+
+    /**  Gamepad 2 = the person logging. Gamepad 1 stays with the driver.
+     *  D-pad up = left side of teeter-totter is UP, D-pad down = right side is UP,
+     *  D-pad left = last shot made, D-pad right = last shot missed,
+     *  left bumper = team red, right bumper = team blue. */
+    public void handleButtons(Gamepad g2) {
+        if (g2.dpad_up && !lastUp) setTeeterSide("left");
+        if (g2.dpad_down && !lastDown) setTeeterSide("right");
+        if (g2.dpad_left && !lastLeft) markResult(true);
+        if (g2.dpad_right && !lastRight) markResult(false);
+        if (g2.left_bumper && !lastLb) setTeam("red");
+        if (g2.right_bumper && !lastRb) setTeam("blue");
+        lastUp = g2.dpad_up;
+        lastDown = g2.dpad_down;
+        lastLeft = g2.dpad_left;
+        lastRight = g2.dpad_right;
+        lastLb = g2.left_bumper;
+        lastRb = g2.right_bumper;
     }
 
     //ALSO IMPORTANT: Please call this markshot thing whenever we fire a shot
@@ -63,7 +90,7 @@ being Will is probably the best way to do this*/
         shotPending = true;
     }
 
-    /** Call when you know the result (it is a button for "scored" / "missed"). */
+    /** (added) Call when you know the result (handleButtons does this for you with the d-pad). */
     public void markResult(boolean hit) {
         if (heldPrefix != null) {
             writeRow(heldPrefix, hit ? "1" : "0", heldSuffix);
@@ -71,23 +98,6 @@ being Will is probably the best way to do this*/
             heldSuffix = null;
         }
     }
-    // (added) D-pad controls: up/down = teeter side, left/right = made/missed
-    // we can adjust these later ;-;
-    private boolean lastUp, lastDown, lastLeft, lastRight;
-
-    public void handleButtons(Gamepad g) {
-        // Only fire once per press, not on every loop while the button is held
-        if (g.dpad_up && !lastUp) setTeeterSide("left");     // left side is UP
-        if (g.dpad_down && !lastDown) setTeeterSide("right"); // right side is UP
-        if (g.dpad_left && !lastLeft) markResult(true);       // made the shot
-        if (g.dpad_right && !lastRight) markResult(false);    // missed the shot
-        lastUp = g.dpad_up;
-        lastDown = g.dpad_down;
-        lastLeft = g.dpad_left;
-        lastRight = g.dpad_right;
-    }
-
-    public String getTeeterSide() { return teeterSide; }
 
     public void update(Gamepad gamepad1, double x, double y, double headingRad,
                        double turretDeg, double flywheelSpeed, double flywheelAngleDeg) {
@@ -115,7 +125,7 @@ being Will is probably the best way to do this*/
         String suffix = (shotPending ? "1" : "0") + "," + team + "," + gameState + "," + teeterSide;
 
         if (shotPending) {
-            // (added) A previous shot never got labeled: save it with a blank hit
+            // A previous shot never got labeled then: save it with a blank hit
             if (heldPrefix != null) writeRow(heldPrefix, "", heldSuffix);
             heldPrefix = prefix;
             heldSuffix = suffix;
@@ -147,6 +157,8 @@ being Will is probably the best way to do this*/
         } catch (IOException ignored) { }
     }
 }
+//!!!HOW TO USE!!!
+
 /* Ok so plain and simple talk down here rq. This code is technically a subsystem but the folder isn't there
  * which is ok. This has a bunch of functions that just need to be implemented into the code whenever we would
  * press a button where it will log it. Additionaly, id like it if you could add a thing that exports a state
@@ -157,34 +169,50 @@ being Will is probably the best way to do this*/
  * a website but ill probably be the one who is doing all the stuff with Will so this shouldn't be
  * a huge problem..... this is definitely forshadowing  ;-;  */
 
-/* (added) UPDATED USAGE, replaces the block above (class name and update() arguments changed):
+/*So here is all the stuff that needs to be done in the op-mode (!NOT AUTO!):
+ in init:
+logger = new DrivingDataLoggerSubsystem(localizer, "Willheham"); <-!Only if Will was the one driving!
 
-fields:
+in the loop:
+logger.update(gamepad1, turretAngleDeg, flywheelSpeed);
+if  (you just fired): logger.markShot();
+
+ when the OpMode stops:
+logger.close();*/
+
+/* (added) UPDATED USAGE, replaces the block above (class name, update() arguments, and buttons changed):
+
+ fields:
 DrivingDataLogger logger = null;
 boolean willIsDriving = false;
 ElapsedTime teleopTimer = new ElapsedTime();
 
-in init_loop: press A on gamepad1 to say "Will is driving"
-        if (gamepad1.a) willIsDriving = true;
-        telemetry.addData("Logging as Will", willIsDriving);
+ in init_loop: press A on gamepad1 to say "Will is driving"
+if (gamepad1.a) willIsDriving = true;
+telemetry.addData("Logging as Will", willIsDriving);
 
-in start():
-        if (willIsDriving) {
-logger = new DrivingDataLogger("Willheham");
+ in start():
+if (willIsDriving) {
+    logger = new DrivingDataLogger("Willheham");
     logger.setTeam("red");   // or "blue"
 }
-        teleopTimer.reset();
+teleopTimer.reset();
 
-in the loop:
-        if (logger != null) {
-        logger.setGameStateFromTime(teleopTimer.seconds());
-        logger.setTeeterSide(teeterSide);   // manual for now
+ in the loop:
+if (logger != null) {
+    logger.setGameStateFromTime(teleopTimer.seconds());
+    logger.handleButtons(gamepad2);
     logger.update(gamepad1, x, y, headingRad, turretAngleDeg, flywheelSpeed, flywheelAngleDeg);
     if (justFired) logger.markShot();
-    if (scoredButton) logger.markResult(true);
-    if (missedButton) logger.markResult(false);
+    telemetry.addData("Team", logger.getTeam());
+    telemetry.addData("Teeter side up", logger.getTeeterSide());
 }
 
-when the OpMode stops:
-        if (logger != null) logger.close();
+ when the OpMode stops:
+if (logger != null) logger.close();
+
+ GAMEPAD 2 (the person logging):
+ D-pad up = left side UP | D-pad down = right side UP
+ D-pad left = shot made  | D-pad right = shot missed
+ Left bumper = red       | Right bumper = blue
 */
