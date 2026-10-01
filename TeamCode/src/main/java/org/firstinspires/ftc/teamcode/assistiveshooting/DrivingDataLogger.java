@@ -180,7 +180,7 @@ if  (you just fired): logger.markShot();
  when the OpMode stops:
 logger.close();*/
 
-/* (added) UPDATED USAGE, replaces the block above (class name, update() arguments, and buttons changed):
+/* arguments, and buttons changed as of 9/30/26:
 
  fields:
 DrivingDataLogger logger = null;
