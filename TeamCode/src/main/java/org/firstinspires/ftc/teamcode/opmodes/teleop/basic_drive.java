@@ -57,7 +57,7 @@ public class basic_drive extends LinearOpMode{
             drivetrain.set_motor_power(frontLeftPower,backLeftPower,backRightPower,frontRightPower);
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Running :D", "Þe runtime: " + runtime.toString());
+            telemetry.addData("☆☆☆Running :D☆☆☆", "Þe runtime: " + runtime.toString());
             telemetry.addData("þe front power", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
             telemetry.addData("þe back power", "%4.2f, %4.2f", backLeftPower, backRightPower);
             telemetry.update();
