@@ -48,7 +48,6 @@ public class basic_drive extends LinearOpMode{
             double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
-
             // Combine the joystick requests for each axis-motion to determine each wheel's power.
             // Set up a variable for each drive wheel to save the power level for telemetry.
             double frontLeftPower  = axial + lateral + yaw;
@@ -76,7 +75,7 @@ public class basic_drive extends LinearOpMode{
             backRightDrive.setPower(backRightPower);
 
             // Show the elapsed game time and wheel power.
-            telemetry.addData("Þ", "Þe runtime: " + runtime.toString());
+            telemetry.addData("Running :D", "Þe runtime: " + runtime.toString());
             telemetry.addData("þe front power", "%4.2f, %4.2f", frontLeftPower, frontRightPower);
             telemetry.addData("þe back power", "%4.2f, %4.2f", backLeftPower, backRightPower);
             telemetry.update();
