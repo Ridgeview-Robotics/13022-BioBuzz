@@ -6,34 +6,20 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.hardware.DcMotorSimple;
 import com.qualcomm.robotcore.util.ElapsedTime;
 
+import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Drivetrain_mecanum;
+import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
+
 @TeleOp(name="basic_drive_intake", group="Linear OpMode")
 
 public class basic_drive_intake extends LinearOpMode{
 
     // Declare OpMode members for each of the 4 motors.
     private ElapsedTime runtime = new ElapsedTime();
-    private DcMotor frontLeftDrive = null;
-    private DcMotor backLeftDrive = null;
-    private DcMotor frontRightDrive = null;
-    private DcMotor backRightDrive = null;
-    private DcMotor intake = null;
+    Drivetrain_mecanum drivetrain;
+    Intake intake;
 
     @Override
     public void runOpMode() {
-
-        // Initialize the hardware variables. Note that the strings used here must correspond
-        // to the names assigned during the robot configuration step on the DS or RC devices.
-        frontLeftDrive = hardwareMap.get(DcMotor.class, "front_left_drive");
-        backLeftDrive = hardwareMap.get(DcMotor.class, "back_left_drive");
-        frontRightDrive = hardwareMap.get(DcMotor.class, "front_right_drive");
-        backRightDrive = hardwareMap.get(DcMotor.class, "back_right_drive");
-        intake = hardwareMap.get(DcMotor.class, "intake");
-
-        frontLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        backLeftDrive.setDirection(DcMotor.Direction.REVERSE);
-        frontRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        backRightDrive.setDirection(DcMotor.Direction.FORWARD);
-        intake.setDirection(DcMotorSimple.Direction.FORWARD);
 
         // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
@@ -71,17 +57,18 @@ public class basic_drive_intake extends LinearOpMode{
                 backRightPower  /= max;
             }
 
-            // Send calculated power to wheels
-            frontLeftDrive.setPower(frontLeftPower);
-            frontRightDrive.setPower(frontRightPower);
-            backLeftDrive.setPower(backLeftPower);
-            backRightDrive.setPower(backRightPower);
+            drivetrain.set_motor_power(frontLeftPower,backLeftPower,backRightPower,frontRightPower);
 
             if (gamepad1.a) {
-                intake.setPower(1);
-                } else {
-                intake.setPower(0);
+                intake.set_intake(1);
+                }
+            else if (gamepad1.right_trigger_pressed) {
+                intake.set_intake(-1);
             }
+            else {
+                intake.set_intake(0);
+            }
+
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Þ", "Þe runtime: " + runtime.toString());
