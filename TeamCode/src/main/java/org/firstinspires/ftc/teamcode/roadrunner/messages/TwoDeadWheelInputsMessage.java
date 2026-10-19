@@ -8,8 +8,8 @@ import org.firstinspires.ftc.robotcore.external.navigation.YawPitchRollAngles;
 
 public final class TwoDeadWheelInputsMessage {
     public long timestamp;
-    public PositionVelocityPair par;
-    public PositionVelocityPair perp;
+    public PositionVelocityPair leftFront;
+    public PositionVelocityPair rightFront;
     public double yaw;
     public double pitch;
     public double roll;
@@ -19,8 +19,8 @@ public final class TwoDeadWheelInputsMessage {
 
     public TwoDeadWheelInputsMessage(PositionVelocityPair par, PositionVelocityPair perp, YawPitchRollAngles angles, AngularVelocity angularVelocity) {
         this.timestamp = System.nanoTime();
-        this.par = par;
-        this.perp = perp;
+        this.leftFront = par;
+        this.rightFront = perp;
         {
             this.yaw = angles.getYaw(AngleUnit.RADIANS);
             this.pitch = angles.getPitch(AngleUnit.RADIANS);
