@@ -10,9 +10,11 @@ import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 public class robot {
     Drivetrain_mecanum drivetrain;
     Intake intake;
+    turret_type turret;
 
     public robot(HardwareMap hardwareMap) {
         intake = new Intake(hardwareMap);
+        turret = new turret_type(hardwareMap);
     }
 
     public void driving_schematic(double x, double y, double r){
@@ -40,6 +42,10 @@ public class robot {
 
     public void set_intake(double a){
         intake.set_intake(a);
+    }
+
+    public void set_launcher(double a){
+        turret.set_turret(a);
     }
 
 
