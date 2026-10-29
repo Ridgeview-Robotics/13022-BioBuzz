@@ -1,5 +1,14 @@
 package org.firstinspires.ftc.teamcode.assistiveshooting;
 
+import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
+import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
+import com.qualcomm.robotcore.hardware.DcMotor;
+import com.qualcomm.robotcore.robot.Robot;
+import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.teamcode.subsystems.robot;
+
+
+
 public class Line_Farm {
 }
 //My ssn is here somewhere :D
@@ -65313,7 +65322,7 @@ public class Line_Farm {
 
 
 
-
+//123-45-6789
 
 
 
