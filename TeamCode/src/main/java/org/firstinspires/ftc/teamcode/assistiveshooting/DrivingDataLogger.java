@@ -9,7 +9,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
-public class DrivingDataLogger {
+public class  DrivingDataLogger {
 
     private BufferedWriter writer;
     private final String sessionId;

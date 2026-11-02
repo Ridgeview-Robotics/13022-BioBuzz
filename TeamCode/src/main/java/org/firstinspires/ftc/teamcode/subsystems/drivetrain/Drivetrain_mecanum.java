@@ -12,6 +12,7 @@ public class Drivetrain_mecanum {
     DcMotorEx br;
 
     public Drivetrain_mecanum(HardwareMap hardwareMap) {
+        //TODO: set these to actual motor names
         fl = hardwareMap.get(DcMotorEx.class, "fl");
         bl = hardwareMap.get(DcMotorEx.class, "bl");
         br = hardwareMap.get(DcMotorEx.class, "br");
