@@ -15,6 +15,7 @@ public class intake_to_shoot_basic extends LinearOpMode{
     private ElapsedTime runtime = new ElapsedTime();
 
     robot robot_new_robot;
+    double launch_speed = 0;
 
     @Override
     public void runOpMode() {
@@ -46,11 +47,20 @@ public class intake_to_shoot_basic extends LinearOpMode{
             }
 
             if (gamepad1.b){
-                robot_new_robot.set_launcher(0.5);
+                robot_new_robot.set_launcher(launch_speed);
+            }
+
+            if (gamepad1.dpad_up && launch_speed != 1.0) {
+                launch_speed += 0.5;
+            }
+
+            if (gamepad1.dpad_down && launch_speed != 0.0) {
+                launch_speed -= 0.5;
             }
 
             // Show the elapsed game time and wheel power.
             telemetry.addData("Þ", "Þe runtime: " + runtime.toString());
+            telemetry.addData("speed of Þe launcher", launch_speed);
             telemetry.update();
         }
     }
