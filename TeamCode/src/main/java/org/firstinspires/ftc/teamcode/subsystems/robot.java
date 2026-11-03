@@ -11,10 +11,12 @@ public class robot {
     Drivetrain_mecanum drivetrain;
     Intake intake;
     turret_type turret;
+    turret_angle_rotate_thingy angler;
 
     public robot(HardwareMap hardwareMap) {
         intake = new Intake(hardwareMap);
         turret = new turret_type(hardwareMap);
+        angler = new turret_angle_rotate_thingy(hardwareMap);
     }
 
     public void driving_schematic(double x, double y, double r){
@@ -48,6 +50,9 @@ public class robot {
         turret.set_turret(a);
     }
 
+    public void lockon(double a) {
+        angler.rotate(a);
+    }
 
 }
 
