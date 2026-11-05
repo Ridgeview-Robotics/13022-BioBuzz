@@ -12,6 +12,7 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(name = "lockonshoot_blue", group = "Linear OpMode")
@@ -24,7 +25,11 @@ public class lockonshoot_blue extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-
+    List<Integer> x_locales = new ArrayList<>(List.of(0,0,0));
+    List<Integer> y_locales = new ArrayList<>(List.of(0,0,0));
+    List<Integer> lx_locales = new ArrayList<>(List.of(0,0,0));
+    List<Integer> ly_locales = new ArrayList<>(List.of(0,0,0));
+    boolean is_shooting = false;
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
@@ -51,6 +56,7 @@ public class lockonshoot_blue extends LinearOpMode {
                 telemetryAprilTag();
 
                 telemetry.addData("speed of Þe launcher", launch_speed);
+                telemetry.addData("is_shooting", is_shooting);
 
                 telemetry.update();
 
@@ -59,7 +65,7 @@ public class lockonshoot_blue extends LinearOpMode {
                 double yaw = gamepad1.right_stick_x;
                 robot_new_robot.driving_schematic(axial, lateral, yaw);
 
-                if (gamepad1.a) {
+                if (gamepad1.left_trigger_pressed) {
                     robot_new_robot.set_intake(1);
                 } else if (gamepad1.right_trigger_pressed) {
                     robot_new_robot.set_intake(-1);
@@ -68,6 +74,12 @@ public class lockonshoot_blue extends LinearOpMode {
                 }
 
                 if (gamepad1.b) {
+                    is_shooting = false;
+                    robot_new_robot.set_launcher(0);
+                }
+
+                if (gamepad1.a) {
+                    is_shooting = true;
                     robot_new_robot.set_launcher(launch_speed);
                 }
 
@@ -86,6 +98,10 @@ public class lockonshoot_blue extends LinearOpMode {
                     visionPortal.resumeStreaming();
                 }
 
+                if (x_locales.get(0)-lx_locales.get(0) != 0 || y_locales.get(0)-ly_locales.get(0) != 0) {
+                    robot_new_robot.driving_schematic(x_locales.get(0)-lx_locales.get(0),y_locales.get(0)-ly_locales.get(0),0);
+                }
+
             }
 
             // Save more CPU resources when camera is no longer needed.
@@ -96,8 +112,13 @@ public class lockonshoot_blue extends LinearOpMode {
     private void telemetryAprilTag() {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
+        int a = 0;
+
+
 
         for (AprilTagDetection detection : currentDetections) {
+            x_locales.set(a, (int) detection.ftcPose.x);
+            y_locales.set(a, (int) detection.ftcPose.y);
             telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
         }
     }
