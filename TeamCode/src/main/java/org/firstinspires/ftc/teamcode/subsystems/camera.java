@@ -1,4 +1,3 @@
 package org.firstinspires.ftc.teamcode.subsystems;
 
-public class camera {
-}
+public class camera {}
