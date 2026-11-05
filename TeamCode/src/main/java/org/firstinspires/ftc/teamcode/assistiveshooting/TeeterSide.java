@@ -10,48 +10,70 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
 import java.util.List;
-/*
-− AprilTag ID’s 30, 31, 32, 33 on the red CELL on the side of the FIELD opposite of the audience.
-− AprilTag ID’s 34, 35, 36, 37 on the red CELL on the audience side.
-− AprilTag ID’s 38, 39, 40, 41 on the blue CELL on the audience side.
-− AprilTag ID’s 42, 43, 44, 45 on the blue CELL on the side of the FIELD opposite of the audience.
- */
+
 public class TeeterSide {
+
+    // Enums declared safely inside the main class body
+    public enum AllianceColor {
+        RED,
+        BLUE
+    }
+
+    public enum FieldSide {
+        AUDIENCE,
+        OPPOSITE_AUDIENCE
+    }
 
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
-
     private AprilTagSingleDetection activeTarget = null;
     private ElapsedTime runtime = new ElapsedTime();
 
     public TeeterSide(HardwareMap hardwareMap, String cameraName) {
-        // 1. Set up the processor
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
                 .build();
 
-        // 2. Set up and initialize the Vision Portal
         visionPortal = new VisionPortal.Builder()
                 .setCamera(hardwareMap.get(WebcamName.class, cameraName))
                 .addProcessor(aprilTagProcessor)
                 .build();
     }
 
-    public void update() {
+    /**
+     * Updates and searches for tags matching your exact alliance and field layout placement.
+     */
+    public void update(AllianceColor alliance, FieldSide side) {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
-        activeTarget = null; // Reset every frame so we don't use old data
+        activeTarget = null;
 
         for (AprilTagDetection detection : detections) {
-            // Check if the detection is an individual tag before processing
             if (detection instanceof AprilTagSingleDetection) {
                 AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
 
-                // Safely read fields from the subclass
-                if (singleDet.metadata != null && singleDet.id >= 30 && singleDet.id <= 33) {
-                    activeTarget = singleDet;
-                    break; // Target found! Stop looking at other tags in this frame
+                if (singleDet.metadata != null) {
+                    int id = singleDet.id;
+
+                    // Match exact game rules criteria
+                    if (alliance == AllianceColor.RED) {
+                        if (side == FieldSide.OPPOSITE_AUDIENCE && id >= 30 && id <= 33) {
+                            activeTarget = singleDet;
+                            break;
+                        } else if (side == FieldSide.AUDIENCE && id >= 34 && id <= 37) {
+                            activeTarget = singleDet;
+                            break;
+                        }
+                    } else if (alliance == AllianceColor.BLUE) {
+                        if (side == FieldSide.AUDIENCE && id >= 38 && id <= 41) {
+                            activeTarget = singleDet;
+                            break;
+                        } else if (side == FieldSide.OPPOSITE_AUDIENCE && id >= 42 && id <= 45) {
+                            activeTarget = singleDet;
+                            break;
+                        }
+                    }
                 }
             }
         }
