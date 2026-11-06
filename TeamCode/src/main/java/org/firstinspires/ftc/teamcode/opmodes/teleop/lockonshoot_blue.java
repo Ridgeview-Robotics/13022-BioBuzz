@@ -32,9 +32,7 @@ public class lockonshoot_blue extends LinearOpMode {
     @Override
     public void runOpMode() {
         telemetry.addData("Status", "Initialized");
-
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
-
         aprilTag.setDecimation(3);
 
         // Create the vision portal the easy way.
@@ -74,11 +72,13 @@ public class lockonshoot_blue extends LinearOpMode {
 
                 if (gamepad1.b) {
                     is_shooting = false;
+                    visionPortal.stopStreaming();
                     robot_new_robot.set_launcher(0);
                 }
 
                 if (gamepad1.a) {
                     is_shooting = true;
+                    visionPortal.resumeStreaming();
                     robot_new_robot.set_launcher(launch_speed);
                 }
 
@@ -90,17 +90,9 @@ public class lockonshoot_blue extends LinearOpMode {
                     launch_speed -= 0.5;
                 }
 
-                // Save CPU resources; can resume streaming when needed.
-                if (gamepad1.dpad_left) {
-                    visionPortal.stopStreaming();
-                } else if (gamepad1.dpad_right) {
-                    visionPortal.resumeStreaming();
-                }
-
                 if (x_locales.get(0)-lx_locales.get(0) != 0 || y_locales.get(0)-ly_locales.get(0) != 0) {
                     robot_new_robot.driving_schematic(2*(x_locales.get(0)-lx_locales.get(0)),2*(y_locales.get(0)-ly_locales.get(0)),0);
                 }
-
             }
 
             visionPortal.close();
