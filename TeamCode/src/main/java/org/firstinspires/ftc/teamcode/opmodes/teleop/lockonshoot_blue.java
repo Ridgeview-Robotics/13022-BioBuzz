@@ -11,7 +11,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -99,12 +98,11 @@ public class lockonshoot_blue extends LinearOpMode {
                 }
 
                 if (x_locales.get(0)-lx_locales.get(0) != 0 || y_locales.get(0)-ly_locales.get(0) != 0) {
-                    robot_new_robot.driving_schematic(x_locales.get(0)-lx_locales.get(0),y_locales.get(0)-ly_locales.get(0),0);
+                    robot_new_robot.driving_schematic(2*(x_locales.get(0)-lx_locales.get(0)),2*(y_locales.get(0)-ly_locales.get(0)),0);
                 }
 
             }
 
-            // Save more CPU resources when camera is no longer needed.
             visionPortal.close();
 
         }
@@ -113,8 +111,6 @@ public class lockonshoot_blue extends LinearOpMode {
         List<AprilTagDetection> currentDetections = aprilTag.getDetections();
         telemetry.addData("# AprilTags Detected", currentDetections.size());
         int a = 0;
-
-
 
         for (AprilTagDetection detection : currentDetections) {
             x_locales.set(a, (int) detection.ftcPose.x);
