@@ -4,36 +4,22 @@ import com.qualcomm.robotcore.hardware.DcMotor;
 import com.qualcomm.robotcore.robot.Robot;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-
 @TeleOp(name="intake_to_shoot_basic", group="Linear OpMode")
-
 public class intake_to_shoot_basic extends LinearOpMode{
-
-    // Declare OpMode members for each of the 4 motors
     private ElapsedTime runtime = new ElapsedTime();
-
     robot robot_new_robot;
     double launch_speed = 0;
-
     @Override
     public void runOpMode() {
-
-        // Wait for the game to start (driver presses START)
         telemetry.addData("Status", "Initialized");
         telemetry.update();
-
         waitForStart();
         runtime.reset();
-
-        // run until the end of the match (driver presses STOP)
         while (opModeIsActive()) {
-
-            // POV Mode uses left joystick to go forward & strafe, and right joystick to rotate.
-            double axial   = -gamepad1.left_stick_y;  // Note: pushing stick forward gives negative value
+            double axial   = -gamepad1.left_stick_y;
             double lateral =  gamepad1.left_stick_x;
             double yaw     =  gamepad1.right_stick_x;
             robot_new_robot.driving_schematic(axial,lateral, yaw);
-
             if (gamepad1.a) {
                 robot_new_robot.set_intake(1);
             }
@@ -43,20 +29,15 @@ public class intake_to_shoot_basic extends LinearOpMode{
             else {
                 robot_new_robot.set_intake(0);
             }
-
             if (gamepad1.b){
                 robot_new_robot.set_launcher(launch_speed);
             }
-
             if (gamepad1.dpad_up && launch_speed != 1.0) {
                 launch_speed += 0.5;
             }
-
             if (gamepad1.dpad_down && launch_speed != 0.0) {
                 launch_speed -= 0.5;
             }
-
-            // Show the elapsed game time and wheel power.
             telemetry.addData("Þ", "Þe runtime: " + runtime.toString());
             telemetry.addData("speed of Þe launcher", launch_speed);
             telemetry.update();

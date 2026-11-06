@@ -34,8 +34,6 @@ public class lockonshoot_blue extends LinearOpMode {
         telemetry.addData("Status", "Initialized");
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
         aprilTag.setDecimation(3);
-
-        // Create the vision portal the easy way.
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
@@ -44,7 +42,6 @@ public class lockonshoot_blue extends LinearOpMode {
                     BuiltinCameraDirection.BACK, aprilTag);
             // Wait for the DS start button to be touched.
             telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-            telemetry.addData(">", "Touch START to start OpMode");
             telemetry.update();
             waitForStart();
 
