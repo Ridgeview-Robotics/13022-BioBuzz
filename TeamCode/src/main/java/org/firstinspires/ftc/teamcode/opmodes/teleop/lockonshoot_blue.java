@@ -21,6 +21,8 @@ public class lockonshoot_blue extends LinearOpMode {
     robot robot_new_robot;
     double launch_speed = 0;
 
+    boolean nectar_mode = false;
+
     private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
@@ -51,6 +53,7 @@ public class lockonshoot_blue extends LinearOpMode {
 
                 telemetry.addData("speed of Þe launcher", launch_speed);
                 telemetry.addData("is_shooting", is_shooting);
+                telemetry.addData("shooting nectar",nectar_mode);
 
                 telemetry.update();
 
@@ -70,13 +73,23 @@ public class lockonshoot_blue extends LinearOpMode {
                 if (gamepad1.b) {
                     is_shooting = false;
                     visionPortal.stopStreaming();
-                    robot_new_robot.set_launcher(0);
+                    robot_new_robot.set_launcher_nectar(0);
+                    robot_new_robot.set_launcher_pollen(0);
                 }
 
                 if (gamepad1.a) {
                     is_shooting = true;
                     visionPortal.resumeStreaming();
-                    robot_new_robot.set_launcher(launch_speed);
+                    if (nectar_mode) {
+                        robot_new_robot.set_launcher_nectar(launch_speed);
+                    } else {
+                        robot_new_robot.set_launcher_pollen(launch_speed);
+                    }
+
+                }
+
+                if (gamepad1.x) {
+                    nectar_mode = !nectar_mode;
                 }
 
                 if (gamepad1.dpad_up && launch_speed != 1.0) {
