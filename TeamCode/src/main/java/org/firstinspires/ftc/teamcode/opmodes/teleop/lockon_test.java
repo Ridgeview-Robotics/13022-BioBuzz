@@ -20,6 +20,8 @@ public class lockon_test extends LinearOpMode {
 
     drivebot drivebot;
 
+    double retaliation = 2;
+
     private ElapsedTime runtime = new ElapsedTime();
 
     private static final boolean USE_WEBCAM = true;
@@ -59,7 +61,6 @@ public class lockon_test extends LinearOpMode {
                 double yaw = gamepad1.right_stick_x;
                 drivebot.driving_schematic(axial, lateral, yaw);
 
-
                 if (gamepad1.b) {
                     is_shooting = false;
                 }
@@ -70,8 +71,16 @@ public class lockon_test extends LinearOpMode {
                 }
 
                 if (x_locales.get(0)-lx_locales.get(0) != 0 || y_locales.get(0)-ly_locales.get(0) != 0) {
-                    drivebot.driving_schematic(2*(x_locales.get(0)-lx_locales.get(0)),2*(y_locales.get(0)-ly_locales.get(0)),0);
+                    drivebot.driving_schematic(retaliation*(x_locales.get(0)-lx_locales.get(0)),retaliation*(y_locales.get(0)-ly_locales.get(0)),0);
                 }
+            }
+
+            if (gamepad1.xWasReleased()){
+                retaliation += 0.1;
+            }
+
+            if (gamepad1.yWasReleased()) {
+                retaliation -= 0.1;
             }
 
             visionPortal.close();
@@ -90,10 +99,3 @@ public class lockon_test extends LinearOpMode {
         }
     }
 }
-
-
-
-
-
-
-
