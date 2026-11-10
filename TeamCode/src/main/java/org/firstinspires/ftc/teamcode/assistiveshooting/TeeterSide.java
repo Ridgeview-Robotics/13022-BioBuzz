@@ -2,6 +2,7 @@ package org.firstinspires.ftc.teamcode.assistiveshooting;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
 import com.qualcomm.robotcore.util.ElapsedTime;
+import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
@@ -13,23 +14,30 @@ import java.util.List;
 
 public class TeeterSide {
 
-    // Enums declared safely inside the main class body
     public enum AllianceColor {
         RED,
-        BLUE
+        BLUE,
+        UNKNOWN
     }
 
     public enum FieldSide {
         AUDIENCE,
-        OPPOSITE_AUDIENCE
+        OPPOSITE_AUDIENCE,
+        UNKNOWN
     }
 
     private AprilTagProcessor aprilTagProcessor;
     private VisionPortal visionPortal;
     private AprilTagSingleDetection activeTarget = null;
-    private ElapsedTime runtime = new ElapsedTime();
+    private Telemetry telemetry;
 
-    public TeeterSide(HardwareMap hardwareMap, String cameraName) {
+    // Track the currently detected state automatically
+    private AllianceColor detectedAlliance = AllianceColor.UNKNOWN;
+    private FieldSide detectedSide = FieldSide.UNKNOWN;
+
+    public TeeterSide(HardwareMap hardwareMap, String cameraName, Telemetry telemetry) {
+        this.telemetry = telemetry;
+
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .setDrawTagID(true)
@@ -42,12 +50,12 @@ public class TeeterSide {
                 .build();
     }
 
-    /**
-     * Updates and searches for tags matching your exact alliance and field layout placement.
-     */
-    public void update(AllianceColor alliance, FieldSide side) {
+    // Updated update method: No parameters needed! It auto-detects based on visible tags.
+    public void update() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         activeTarget = null;
+        detectedAlliance = AllianceColor.UNKNOWN;
+        detectedSide = FieldSide.UNKNOWN;
 
         for (AprilTagDetection detection : detections) {
             if (detection instanceof AprilTagSingleDetection) {
@@ -56,26 +64,43 @@ public class TeeterSide {
                 if (singleDet.metadata != null) {
                     int id = singleDet.id;
 
-                    // Match exact game rules criteria
-                    if (alliance == AllianceColor.RED) {
-                        if (side == FieldSide.OPPOSITE_AUDIENCE && id >= 30 && id <= 33) {
-                            activeTarget = singleDet;
-                            break;
-                        } else if (side == FieldSide.AUDIENCE && id >= 34 && id <= 37) {
-                            activeTarget = singleDet;
-                            break;
-                        }
-                    } else if (alliance == AllianceColor.BLUE) {
-                        if (side == FieldSide.AUDIENCE && id >= 38 && id <= 41) {
-                            activeTarget = singleDet;
-                            break;
-                        } else if (side == FieldSide.OPPOSITE_AUDIENCE && id >= 42 && id <= 45) {
-                            activeTarget = singleDet;
-                            break;
-                        }
+                    // Automatically determine alliance and side from tag ID ranges
+                    if (id >= 30 && id <= 33) {
+                        activeTarget = singleDet;
+                        detectedAlliance = AllianceColor.RED;
+                        detectedSide = FieldSide.OPPOSITE_AUDIENCE;
+                        break;
+                    } else if (id >= 34 && id <= 37) {
+                        activeTarget = singleDet;
+                        detectedAlliance = AllianceColor.RED;
+                        detectedSide = FieldSide.AUDIENCE;
+                        break;
+                    } else if (id >= 38 && id <= 41) {
+                        activeTarget = singleDet;
+                        detectedAlliance = AllianceColor.BLUE;
+                        detectedSide = FieldSide.AUDIENCE;
+                        break;
+                    } else if (id >= 42 && id <= 45) {
+                        activeTarget = singleDet;
+                        detectedAlliance = AllianceColor.BLUE;
+                        detectedSide = FieldSide.OPPOSITE_AUDIENCE;
+                        break;
                     }
                 }
             }
+        }
+
+        // Send telemetry to the Driver Station
+        if (telemetry != null) {
+            telemetry.addData("Has Target", hasTarget());
+            if (hasTarget()) {
+                telemetry.addData("Target ID", getTargetId());
+                telemetry.addData("Detected Alliance", detectedAlliance);
+                telemetry.addData("Detected Side", detectedSide);
+            } else {
+                telemetry.addData("Status", "Searching for tags...");
+            }
+            telemetry.update();
         }
     }
 
@@ -87,16 +112,12 @@ public class TeeterSide {
         return hasTarget() ? activeTarget.id : -1;
     }
 
-    public double getTargetX() {
-        return hasTarget() ? activeTarget.ftcPose.x : 0.0;
+    public AllianceColor getDetectedAlliance() {
+        return detectedAlliance;
     }
 
-    public double getTargetY() {
-        return hasTarget() ? activeTarget.ftcPose.y : 0.0;
-    }
-
-    public double getTargetBearing() {
-        return hasTarget() ? activeTarget.ftcPose.bearing : 0.0;
+    public FieldSide getDetectedSide() {
+        return detectedSide;
     }
 
     public void close() {
