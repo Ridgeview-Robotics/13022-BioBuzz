@@ -1,12 +1,10 @@
 package org.firstinspires.ftc.teamcode.assistiveshooting;
 
 import com.qualcomm.robotcore.hardware.HardwareMap;
-import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.robotcore.external.Telemetry;
 import org.firstinspires.ftc.robotcore.external.hardware.camera.WebcamName;
 import org.firstinspires.ftc.vision.VisionPortal;
 import org.firstinspires.ftc.vision.apriltag.AprilTagDetection;
-import org.firstinspires.ftc.vision.apriltag.AprilTagGameDatabase;
 import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 
@@ -31,15 +29,14 @@ public class TeeterSide {
     private AprilTagSingleDetection activeTarget = null;
     private Telemetry telemetry;
 
-    // Track the currently detected state automatically
     private AllianceColor detectedAlliance = AllianceColor.UNKNOWN;
     private FieldSide detectedSide = FieldSide.UNKNOWN;
 
     public TeeterSide(HardwareMap hardwareMap, String cameraName, Telemetry telemetry) {
         this.telemetry = telemetry;
 
+        // Omitting getCurrentGameTagLibrary() allows custom tag IDs (30-45) to be detected
         aprilTagProcessor = new AprilTagProcessor.Builder()
-                .setTagLibrary(AprilTagGameDatabase.getCurrentGameTagLibrary())
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
                 .build();
@@ -50,7 +47,6 @@ public class TeeterSide {
                 .build();
     }
 
-    // Updated update method: No parameters needed! It auto-detects based on visible tags.
     public void update() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         activeTarget = null;
@@ -58,45 +54,46 @@ public class TeeterSide {
         detectedSide = FieldSide.UNKNOWN;
 
         for (AprilTagDetection detection : detections) {
+            // In SDK 12.0+, cast to AprilTagSingleDetection to access .id
             if (detection instanceof AprilTagSingleDetection) {
                 AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
+                int id = singleDet.id;
 
-                if (singleDet.metadata != null) {
-                    int id = singleDet.id;
-
-                    // Automatically determine alliance and side from tag ID ranges
-                    if (id >= 30 && id <= 33) {
-                        activeTarget = singleDet;
-                        detectedAlliance = AllianceColor.RED;
-                        detectedSide = FieldSide.OPPOSITE_AUDIENCE;
-                        break;
-                    } else if (id >= 34 && id <= 37) {
-                        activeTarget = singleDet;
-                        detectedAlliance = AllianceColor.RED;
-                        detectedSide = FieldSide.AUDIENCE;
-                        break;
-                    } else if (id >= 38 && id <= 41) {
-                        activeTarget = singleDet;
-                        detectedAlliance = AllianceColor.BLUE;
-                        detectedSide = FieldSide.AUDIENCE;
-                        break;
-                    } else if (id >= 42 && id <= 45) {
-                        activeTarget = singleDet;
-                        detectedAlliance = AllianceColor.BLUE;
-                        detectedSide = FieldSide.OPPOSITE_AUDIENCE;
-                        break;
-                    }
+                if (id >= 30 && id <= 33) {
+                    activeTarget = singleDet;
+                    detectedAlliance = AllianceColor.RED;
+                    detectedSide = FieldSide.OPPOSITE_AUDIENCE;
+                    break;
+                } else if (id >= 34 && id <= 37) {
+                    activeTarget = singleDet;
+                    detectedAlliance = AllianceColor.RED;
+                    detectedSide = FieldSide.AUDIENCE;
+                    break;
+                } else if (id >= 38 && id <= 41) {
+                    activeTarget = singleDet;
+                    detectedAlliance = AllianceColor.BLUE;
+                    detectedSide = FieldSide.AUDIENCE;
+                    break;
+                } else if (id >= 42 && id <= 45) {
+                    activeTarget = singleDet;
+                    detectedAlliance = AllianceColor.BLUE;
+                    detectedSide = FieldSide.OPPOSITE_AUDIENCE;
+                    break;
                 }
             }
         }
 
         // Send telemetry to the Driver Station
         if (telemetry != null) {
-            telemetry.addData("Has Target", hasTarget());
+            telemetry.addData("Total Raw Detections", detections.size());
+            telemetry.addData("Has Valid Target", hasTarget());
+
             if (hasTarget()) {
                 telemetry.addData("Target ID", getTargetId());
                 telemetry.addData("Detected Alliance", detectedAlliance);
                 telemetry.addData("Detected Side", detectedSide);
+            } else if (!detections.isEmpty() && detections.get(0) instanceof AprilTagSingleDetection) {
+                telemetry.addData("Saw Unmatched Tag ID", ((AprilTagSingleDetection) detections.get(0)).id);
             } else {
                 telemetry.addData("Status", "Searching for tags...");
             }
@@ -121,7 +118,7 @@ public class TeeterSide {
     }
 
     public void close() {
-        if (visionPortal.getCameraState() != VisionPortal.CameraState.CAMERA_DEVICE_CLOSED) {
+        if (visionPortal != null && visionPortal.getCameraState() != VisionPortal.CameraState.CAMERA_DEVICE_CLOSED) {
             visionPortal.close();
         }
     }
