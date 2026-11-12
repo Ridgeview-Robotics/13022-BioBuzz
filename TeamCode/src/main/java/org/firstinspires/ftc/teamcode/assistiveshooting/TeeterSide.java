@@ -29,13 +29,14 @@ public class TeeterSide {
     private AprilTagSingleDetection activeTarget = null;
     private Telemetry telemetry;
 
+    private AllianceColor targetAlliance;
     private AllianceColor detectedAlliance = AllianceColor.UNKNOWN;
     private FieldSide detectedSide = FieldSide.UNKNOWN;
 
-    public TeeterSide(HardwareMap hardwareMap, String cameraName, Telemetry telemetry) {
+    public TeeterSide(HardwareMap hardwareMap, String cameraName, Telemetry telemetry, AllianceColor alliance) {
         this.telemetry = telemetry;
+        this.targetAlliance = alliance;
 
-        // Omitting getCurrentGameTagLibrary() allows custom tag IDs (30-45) to be detected
         aprilTagProcessor = new AprilTagProcessor.Builder()
                 .setDrawTagID(true)
                 .setDrawTagOutline(true)
@@ -54,27 +55,26 @@ public class TeeterSide {
         detectedSide = FieldSide.UNKNOWN;
 
         for (AprilTagDetection detection : detections) {
-            // In SDK 12.0+, cast to AprilTagSingleDetection to access .id
             if (detection instanceof AprilTagSingleDetection) {
                 AprilTagSingleDetection singleDet = (AprilTagSingleDetection) detection;
                 int id = singleDet.id;
 
-                if (id >= 30 && id <= 33) {
+                if (targetAlliance == AllianceColor.RED && id >= 30 && id <= 33) {
                     activeTarget = singleDet;
                     detectedAlliance = AllianceColor.RED;
                     detectedSide = FieldSide.OPPOSITE_AUDIENCE;
                     break;
-                } else if (id >= 34 && id <= 37) {
+                } else if (targetAlliance == AllianceColor.RED && id >= 34 && id <= 37) {
                     activeTarget = singleDet;
                     detectedAlliance = AllianceColor.RED;
                     detectedSide = FieldSide.AUDIENCE;
                     break;
-                } else if (id >= 38 && id <= 41) {
+                } else if (targetAlliance == AllianceColor.BLUE && id >= 38 && id <= 41) {
                     activeTarget = singleDet;
                     detectedAlliance = AllianceColor.BLUE;
                     detectedSide = FieldSide.AUDIENCE;
                     break;
-                } else if (id >= 42 && id <= 45) {
+                } else if (targetAlliance == AllianceColor.BLUE && id >= 42 && id <= 45) {
                     activeTarget = singleDet;
                     detectedAlliance = AllianceColor.BLUE;
                     detectedSide = FieldSide.OPPOSITE_AUDIENCE;
@@ -83,19 +83,18 @@ public class TeeterSide {
             }
         }
 
-        // Send telemetry to the Driver Station
         if (telemetry != null) {
+            telemetry.addData("Target Alliance", targetAlliance);
             telemetry.addData("Total Raw Detections", detections.size());
             telemetry.addData("Has Valid Target", hasTarget());
 
             if (hasTarget()) {
                 telemetry.addData("Target ID", getTargetId());
-                telemetry.addData("Detected Alliance", detectedAlliance);
                 telemetry.addData("Detected Side", detectedSide);
             } else if (!detections.isEmpty() && detections.get(0) instanceof AprilTagSingleDetection) {
                 telemetry.addData("Saw Unmatched Tag ID", ((AprilTagSingleDetection) detections.get(0)).id);
             } else {
-                telemetry.addData("Status", "Searching for tags...");
+                telemetry.addData("Status", "Searching for " + targetAlliance + " tags...");
             }
             telemetry.update();
         }
