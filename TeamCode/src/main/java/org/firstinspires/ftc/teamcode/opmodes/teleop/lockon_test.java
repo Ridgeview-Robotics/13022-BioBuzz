@@ -15,6 +15,8 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import java.util.ArrayList;
 import java.util.List;
 
+
+
 @TeleOp(name = "lockonshoot_blue", group = "Linear OpMode")
 public class lockon_test extends LinearOpMode {
 
@@ -32,22 +34,22 @@ public class lockon_test extends LinearOpMode {
     List<Integer> lx_locales = new ArrayList<>(List.of(0,0,0));
     List<Integer> ly_locales = new ArrayList<>(List.of(0,0,0));
     boolean is_shooting = false;
+
     @Override
     public void runOpMode() {
-        telemetry.addData("Status", "Initialized");
         aprilTag = AprilTagProcessor.easyCreateWithDefaults();
-        aprilTag.setDecimation(3);
         if (USE_WEBCAM) {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     hardwareMap.get(WebcamName.class, "Webcam 1"), aprilTag);
         } else {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     BuiltinCameraDirection.BACK, aprilTag);
-            // Wait for the DS start button to be touched.
-            telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
-            telemetry.update();
-            waitForStart();
 
+            telemetry.addData("Status", "Initialized");
+            telemetry.update();
+
+            waitForStart();
+            runtime.reset();
             while (opModeIsActive()) {
 
                 telemetryAprilTag();

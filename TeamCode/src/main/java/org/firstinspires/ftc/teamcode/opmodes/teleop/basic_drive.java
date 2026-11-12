@@ -14,7 +14,7 @@ public class basic_drive extends LinearOpMode{
     // Declare OpMode members for each of the 4 motors
     private ElapsedTime runtime = new ElapsedTime();
 
-    robot robot_new_robot;
+    robot robot_new_robot = new Robot(hardwareMap);
 
     @Override
     public void runOpMode() {
