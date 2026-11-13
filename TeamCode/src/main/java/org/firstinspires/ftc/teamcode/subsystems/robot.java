@@ -8,7 +8,6 @@ import org.firstinspires.ftc.teamcode.subsystems.drivetrain.Drivetrain_mecanum;
 import org.firstinspires.ftc.teamcode.subsystems.intake.Intake;
 
 public class robot {
-    HardwareMap hardwareMap;
     Drivetrain_mecanum drivetrain;
     Intake intake;
     turret_type turret;
