@@ -51,8 +51,6 @@ public class TeeterSide {
     public void update() {
         List<AprilTagDetection> detections = aprilTagProcessor.getDetections();
         activeTarget = null;
-        detectedAlliance = AllianceColor.UNKNOWN;
-        detectedSide = FieldSide.UNKNOWN;
 
         for (AprilTagDetection detection : detections) {
             if (detection instanceof AprilTagSingleDetection) {
@@ -84,17 +82,14 @@ public class TeeterSide {
         }
 
         if (telemetry != null) {
-            telemetry.addData("Target Alliance", targetAlliance);
-            telemetry.addData("Total Raw Detections", detections.size());
-            telemetry.addData("Has Valid Target", hasTarget());
+            telemetry.addData("Alliance", targetAlliance);
+            telemetry.addData("Current Side", detectedSide);
+            telemetry.addData("Actively Seeing Tag", hasTarget());
 
             if (hasTarget()) {
-                telemetry.addData("Target ID", getTargetId());
-                telemetry.addData("Detected Side", detectedSide);
+                telemetry.addData("Tag ID", getTargetId());
             } else if (!detections.isEmpty() && detections.get(0) instanceof AprilTagSingleDetection) {
-                telemetry.addData("Saw Unmatched Tag ID", ((AprilTagSingleDetection) detections.get(0)).id);
-            } else {
-                telemetry.addData("Status", "Searching for " + targetAlliance + " tags...");
+                telemetry.addData("Ignored Other Tag ID", ((AprilTagSingleDetection) detections.get(0)).id);
             }
             telemetry.update();
         }
