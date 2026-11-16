@@ -54,14 +54,11 @@ public class lockon_test extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-
-
                 List<AprilTagDetection> currentDetections = aprilTag.getDetections();
                 telemetry.addData("# AprilTags Detected", currentDetections.size());
 
-
-            ly_locales.set(0,0);
-            lx_locales.set(0,0);
+            ly_locales.set(1,1);
+            lx_locales.set(1,1);
 
 
             telemetry.addData("lx:",lx_locales);
@@ -77,7 +74,7 @@ public class lockon_test extends LinearOpMode {
                     telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
                 }
 
-                telemetry.addData("is_shooting", is_shooting);
+                telemetry.addData("is_shooting/retaliating", is_shooting);
 
                 telemetry.update();
 
@@ -97,7 +94,7 @@ public class lockon_test extends LinearOpMode {
 
                 if (is_shooting) {
                     if (ly_locales.get(0) == 0 && ly_locales.get(1)== 0 && ly_locales.get(2) == 0){
-                        telemetry.addLine("hi");
+                        telemetry.addLine("✦✦✦edge✦case✦✦✦");
                         ly_locales = y_locales;
                         lx_locales = x_locales;
                     }
