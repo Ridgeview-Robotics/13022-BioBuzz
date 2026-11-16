@@ -50,15 +50,11 @@ public class lockon_test extends LinearOpMode {
         }
 
         drivebot drivebot = new drivebot(hardwareMap);
-
         waitForStart();
 
         while (opModeIsActive()) {
                 List<AprilTagDetection> currentDetections = aprilTag.getDetections();
                 telemetry.addData("# AprilTags Detected", currentDetections.size());
-
-            ly_locales.set(1,1);
-            lx_locales.set(1,1);
 
 
             telemetry.addData("lx:",lx_locales);
@@ -88,15 +84,15 @@ public class lockon_test extends LinearOpMode {
                 }
 
                 if (gamepad1.a) {
-                    is_shooting = true;
+                is_shooting = true;
                     visionPortal.resumeStreaming();
                 }
 
                 if (is_shooting) {
-                    if (ly_locales.get(0) == 0 && ly_locales.get(1)== 0 && ly_locales.get(2) == 0){
+                    if (ly_locales.get(0) == 0 && ly_locales.get(1) == 0 && ly_locales.get(2) == 0){
                         telemetry.addLine("✦✦✦edge✦case✦✦✦");
-                        ly_locales = y_locales;
-                        lx_locales = x_locales;
+//                        ly_locales = y_locales;
+//                        lx_locales = x_locales;
                     }
                     drivebot.driving_schematic(retaliation * (x_locales.get(0) - lx_locales.get(0)), retaliation * (y_locales.get(0) - ly_locales.get(0)), 0);
 
