@@ -27,10 +27,10 @@ public class lockon_test extends LinearOpMode {
     private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    List<Integer> x_locales = new ArrayList<>(List.of(0,0,0));
-    List<Integer> y_locales = new ArrayList<>(List.of(0,0,0));
-    List<Integer> lx_locales = new ArrayList<>(List.of(0,0,0));
-    List<Integer> ly_locales = new ArrayList<>(List.of(0,0,0));
+    float x_locales = 0.0F;
+    float y_locales = 0.0F;
+    float lx_locales = 0.0F;
+    float ly_locales = 0.0F;
     boolean is_shooting = false;
 
     @Override
@@ -53,24 +53,35 @@ public class lockon_test extends LinearOpMode {
         waitForStart();
 
         while (opModeIsActive()) {
-                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-                telemetry.addData("# AprilTags Detected", currentDetections.size());
 
 
-            telemetry.addData("lx:",lx_locales);
-            telemetry.addData("ly:",ly_locales);
-            telemetry.addData("y:",y_locales);
-            telemetry.addData("x:",x_locales);
+                    lx_locales = x_locales;
+                    ly_locales = y_locales;
 
-                int a = 0;
+            List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+            telemetry.addData("# AprilTags Detected", currentDetections.size());
 
-                for (AprilTagDetection detection : currentDetections) {
-                    x_locales.set(a, (int) detection.ftcPose.x);
-                    y_locales.set(a, (int) detection.ftcPose.y);
-                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
-                }
+            for (AprilTagDetection detection : currentDetections) {
+                x_locales =(float) detection.ftcPose.x;
+                y_locales =(float) detection.ftcPose.y;
+                telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+            }
+
+            float b = lx_locales - x_locales;
+            float c = ly_locales - y_locales;
+
+            telemetry.addData("lx:", lx_locales);
+            telemetry.addData("ly:", ly_locales);
+            telemetry.addData("y:", y_locales);
+            telemetry.addData("x:", x_locales);
+            telemetry.addData("moveby x:", b);
+            telemetry.addData("moveby y:", c);
+            
+
 
                 telemetry.addData("is_shooting/retaliating", is_shooting);
+                telemetry.addData("retalitation value:",retaliation);
+
 
                 telemetry.update();
 
@@ -89,12 +100,12 @@ public class lockon_test extends LinearOpMode {
                 }
 
                 if (is_shooting) {
-                    if (ly_locales.get(0) == 0 && ly_locales.get(1) == 0 && ly_locales.get(2) == 0){
-                        telemetry.addLine("✦✦✦edge✦case✦✦✦");
-//                        ly_locales = y_locales;
-//                        lx_locales = x_locales;
+                    if (ly_locales == 0 && lx_locales == 0){
+                        telemetry.addLine("✦✦✦edge✦case✦✦✦þ");
+                        ly_locales = y_locales;
+                        lx_locales = x_locales;
                     }
-                    drivebot.driving_schematic(retaliation * (x_locales.get(0) - lx_locales.get(0)), retaliation * (y_locales.get(0) - ly_locales.get(0)), 0);
+                    drivebot.driving_schematic(retaliation * (x_locales - lx_locales), retaliation * (y_locales - ly_locales), 0);
 
 
                 if (gamepad1.xWasReleased()) {
