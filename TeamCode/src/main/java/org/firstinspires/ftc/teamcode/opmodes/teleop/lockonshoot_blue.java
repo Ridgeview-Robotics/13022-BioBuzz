@@ -89,14 +89,17 @@ public class lockonshoot_blue extends LinearOpMode {
                 }
 
                 if (gamepad1.x) {nectar_mode = !nectar_mode;}
-
+                
                 if (gamepad1.dpad_up && launch_speed != 1.0) {launch_speed += 0.5;}
-
                 if (gamepad1.dpad_down && launch_speed != 0.0) {launch_speed -= 0.5;}
 
                 if (x_locales.get(0)-lx_locales.get(0) != 0 || y_locales.get(0)-ly_locales.get(0) != 0) {
                     robot_new_robot.driving_schematic(2*(x_locales.get(0)-lx_locales.get(0)),2*(y_locales.get(0)-ly_locales.get(0)),0);
                 }
+
+                if (gamepad1.dpad_left){robot_new_robot.lockon(1);}
+                if (gamepad1.dpad_right){robot_new_robot.lockon(-1);}
+
             }
 
             visionPortal.close();
