@@ -20,16 +20,17 @@ public class lockonshoot_blue extends LinearOpMode {
     private ElapsedTime runtime = new ElapsedTime();
     robot robot_new_robot;
     double launch_speed = 0;
+    double retaliation = 20;
 
     boolean nectar_mode = false;
 
     private static final boolean USE_WEBCAM = true;
     private AprilTagProcessor aprilTag;
     private VisionPortal visionPortal;
-    List<Integer> x_locales = new ArrayList<>(List.of(0,0,0));
-    List<Integer> y_locales = new ArrayList<>(List.of(0,0,0));
-    List<Integer> lx_locales = new ArrayList<>(List.of(0,0,0));
-    List<Integer> ly_locales = new ArrayList<>(List.of(0,0,0));
+    float x_locales = 0.0F;
+    float y_locales = 0.0F;
+    float lx_locales = 0.0F;
+    float ly_locales = 0.0F;
     boolean is_shooting = false;
     @Override
     public void runOpMode() {
@@ -42,19 +43,37 @@ public class lockonshoot_blue extends LinearOpMode {
         } else {
             visionPortal = VisionPortal.easyCreateWithDefaults(
                     BuiltinCameraDirection.BACK, aprilTag);
-            // Wait for the DS start button to be touched.
-            telemetry.addData("DS preview on/off", "3 dots, Camera Stream");
             telemetry.update();
             waitForStart();
 
             while (opModeIsActive()) {
 
-                telemetryAprilTag();
+                lx_locales = x_locales;
+                ly_locales = y_locales;
 
+                List<AprilTagDetection> currentDetections = aprilTag.getDetections();
+                telemetry.addData("# AprilTags Detected", currentDetections.size());
+
+                for (AprilTagDetection detection : currentDetections) {
+                    x_locales =(float) detection.ftcPose.x;
+                    y_locales =(float) detection.ftcPose.y;
+                    telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
+                }
+
+                float b = lx_locales - x_locales;
+                float c = ly_locales - y_locales;
+
+                telemetry.addData("lx:", lx_locales);
+                telemetry.addData("ly:", ly_locales);
+                telemetry.addData("y:", y_locales);
+                telemetry.addData("x:", x_locales);
+                telemetry.addData("move_by x:", b);
+                telemetry.addData("move_by y:", c);
                 telemetry.addData("speed of Þe launcher", launch_speed);
                 telemetry.addData("is_shooting", is_shooting);
                 telemetry.addData("shooting nectar",nectar_mode);
-
+                telemetry.addData("is_shooting/retaliating", is_shooting);
+                telemetry.addData("retalitation value:",retaliation);
                 telemetry.update();
 
                 double axial = -gamepad1.left_stick_y;
@@ -64,10 +83,16 @@ public class lockonshoot_blue extends LinearOpMode {
 
                 if (gamepad1.left_trigger_pressed) {
                     robot_new_robot.set_intake(1);
-                } else if (gamepad1.right_trigger_pressed) {
-                    robot_new_robot.set_intake(-1);
                 } else {
                     robot_new_robot.set_intake(0);
+                }
+
+                if (gamepad1.xWasReleased()) {
+                    retaliation += 1;
+                }
+
+                if (gamepad1.yWasReleased()) {
+                    retaliation -= 1;
                 }
 
                 if (gamepad1.b) {
@@ -88,13 +113,18 @@ public class lockonshoot_blue extends LinearOpMode {
 
                 }
 
-                if (gamepad1.x) {nectar_mode = !nectar_mode;}
+                if (gamepad1.right_bumper) {nectar_mode = !nectar_mode;}
 
                 if (gamepad1.dpad_up && launch_speed != 1.0) {launch_speed += 0.05;}
                 if (gamepad1.dpad_down && launch_speed != 0.0) {launch_speed -= 0.05;}
 
-                if (x_locales.get(0)-lx_locales.get(0) != 0 || y_locales.get(0)-ly_locales.get(0) != 0) {
-                    robot_new_robot.driving_schematic(2*(x_locales.get(0)-lx_locales.get(0)),2*(y_locales.get(0)-ly_locales.get(0)),0);
+                if (is_shooting) {
+                    if (ly_locales == 0 && lx_locales == 0){
+                        telemetry.addLine("✦✦✦edge✦case✦✦✦");
+                        ly_locales = y_locales;
+                        lx_locales = x_locales;
+                    }
+                    robot_new_robot.driving_schematic(retaliation * (x_locales - lx_locales), retaliation * (y_locales - ly_locales), 0);
                 }
 
                 if (gamepad1.dpad_left){robot_new_robot.lockon(1);}
@@ -104,17 +134,6 @@ public class lockonshoot_blue extends LinearOpMode {
 
             visionPortal.close();
 
-        }
-    }
-    private void telemetryAprilTag() {
-        List<AprilTagDetection> currentDetections = aprilTag.getDetections();
-        telemetry.addData("# AprilTags Detected", currentDetections.size());
-        int a = 0;
-
-        for (AprilTagDetection detection : currentDetections) {
-            x_locales.set(a, (int) detection.ftcPose.x);
-            y_locales.set(a, (int) detection.ftcPose.y);
-            telemetry.addLine(String.format("XYZ %6.1f %6.1f %6.1f  (inch)", detection.ftcPose.x, detection.ftcPose.y, detection.ftcPose.z));
         }
     }
 }

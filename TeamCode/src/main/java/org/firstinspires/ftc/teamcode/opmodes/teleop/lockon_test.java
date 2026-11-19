@@ -55,8 +55,8 @@ public class lockon_test extends LinearOpMode {
         while (opModeIsActive()) {
 
 
-                    lx_locales = x_locales;
-                    ly_locales = y_locales;
+            lx_locales = x_locales;
+            ly_locales = y_locales;
 
             List<AprilTagDetection> currentDetections = aprilTag.getDetections();
             telemetry.addData("# AprilTags Detected", currentDetections.size());
