@@ -45,18 +45,14 @@ public class robot {
     public void set_intake(double a){
         intake.set_intake(a);
     }
-
     public void set_launcher_nectar(double a){
         turret.set_turret_nectar(a);
     }
     public void set_launcher_pollen(double a){
         turret.set_turret_pollen(a);
     }
-
     public void lockon(double a) {
         angler.rotate(a);
     }
 
 }
-
-

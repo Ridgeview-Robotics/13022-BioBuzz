@@ -76,12 +76,9 @@ public class lockon_test extends LinearOpMode {
             telemetry.addData("x:", x_locales);
             telemetry.addData("moveby x:", b);
             telemetry.addData("moveby y:", c);
-            
-
 
                 telemetry.addData("is_shooting/retaliating", is_shooting);
                 telemetry.addData("retalitation value:",retaliation);
-
 
                 telemetry.update();
 
@@ -96,7 +93,7 @@ public class lockon_test extends LinearOpMode {
 
                 if (gamepad1.a) {
                 is_shooting = true;
-                    visionPortal.resumeStreaming();
+                visionPortal.resumeStreaming();
                 }
 
                 if (is_shooting) {
