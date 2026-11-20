@@ -11,7 +11,6 @@ import org.firstinspires.ftc.vision.apriltag.AprilTagProcessor;
 import org.firstinspires.ftc.vision.apriltag.AprilTagSingleDetection;
 import com.qualcomm.robotcore.util.ElapsedTime;
 import org.firstinspires.ftc.teamcode.subsystems.robot;
-import java.util.ArrayList;
 import java.util.List;
 
 @TeleOp(name = "lockonshoot_blue", group = "Linear OpMode")
