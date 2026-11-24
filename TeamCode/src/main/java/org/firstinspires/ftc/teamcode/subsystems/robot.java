@@ -12,11 +12,13 @@ public class robot {
     Intake intake;
     turret_type turret;
     turret_angle_rotate_thingy angler;
+    public VertLift lift;
 
     public robot(HardwareMap hardwareMap) {
         intake = new Intake(hardwareMap);
         turret = new turret_type(hardwareMap);
         angler = new turret_angle_rotate_thingy(hardwareMap);
+        lift = new VertLift(hardwareMap);
     }
 
     public void driving_schematic(double x, double y, double r){
