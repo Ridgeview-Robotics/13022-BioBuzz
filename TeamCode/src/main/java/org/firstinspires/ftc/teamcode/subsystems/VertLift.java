@@ -26,10 +26,14 @@ public class VertLift {
     // ---- data ----
     private DcMotor leftMotor;
     private DcMotor rightMotor;
+    private PIDController pid;
+    private int targetTicks;
+    private double kG = 0;
+    private double maxPower = 0.4;
     private LiftPosition currentLiftPosition = LiftPosition.UNKNOWN;
     private LiftPosition wantedLiftPosition = LiftPosition.DOWN;
 
-    // BUILDER
+    // ---- constructor ----
     public VertLift(HardwareMap hardwareMap) {
         leftMotor = hardwareMap.get(DcMotor.class, "leftLift");
         rightMotor = hardwareMap.get(DcMotor.class, "rightLift");
@@ -37,45 +41,49 @@ public class VertLift {
         rightMotor.setDirection(DcMotor.Direction.REVERSE);
 
         leftMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        leftMotor.setTargetPosition(0);
-        leftMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        leftMotor.setPower(0.5);
+        leftMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
+        rightMotor.setMode(DcMotor.RunMode.RUN_WITHOUT_ENCODER);
 
-        rightMotor.setMode(DcMotor.RunMode.STOP_AND_RESET_ENCODER);
-        rightMotor.setTargetPosition(0);
-        rightMotor.setMode(DcMotor.RunMode.RUN_TO_POSITION);
-        rightMotor.setPower(0.5);
+        leftMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+        rightMotor.setZeroPowerBehavior(DcMotor.ZeroPowerBehavior.BRAKE);
+
+        pid = new PIDController(0.005, 0, 0);   // kP, kI, kD starting guesses
     }
 
-    // ---- setter: remembers the wanted position AND sends the new target ----
+    // ---- setter ----
     public void setWantedPosition(LiftPosition p) {
-        if (p == LiftPosition.UNKNOWN) return;      // UNKNOWN is never a valid goal
+        if (p == LiftPosition.UNKNOWN) return;
         wantedLiftPosition = p;
-        leftMotor.setTargetPosition(p.getTarget());
-        rightMotor.setTargetPosition(p.getTarget());
+        targetTicks = p.getTarget();
+        pid.reset();
     }
 
     // ---- getters ----
     public LiftPosition getCurrentPosition() { return currentLiftPosition; }
     public int getLeftPos() { return leftMotor.getCurrentPosition(); }
-    public int getRightPos() { return rightMotor.getCurrentPosition(); }
 
     // ---- called once per loop from the OpMode ----
     public void update() {
-        // PART 1: is the lift inside the wanted position's range?
-        //   - read left and right with getLeftPos() / getRightPos()
-        //   - range is wantedLiftPosition.getMin() to .getMax()
-        //   - boolean inRange = (left in range) && (right in range);
+        double power = pid.calculate(targetTicks,getLeftPos()) + kG;
+        power = Math.max(-maxPower, Math.min(maxPower, power));
 
-        // PART 2: if NOT inRange, send the target again
-        //   - same two setTargetPosition lines as the setter, using
-        //     wantedLiftPosition.getTarget()
-        //   - this is the "got pushed out of place" correction
+        leftMotor.setPower(power);
+        rightMotor.setPower(power);
 
-        // PART 3: work out where the lift actually is
-        //   - set currentLiftPosition = UNKNOWN first
-        //   - loop over LiftPosition.values(), skip UNKNOWN
-        //   - if both encoders are in that value's range,
-        //     set currentLiftPosition to it
+        int pos = getLeftPos();
+
+        currentLiftPosition = LiftPosition.UNKNOWN;
+        for (LiftPosition p : LiftPosition.values()) {
+            if (p == LiftPosition.UNKNOWN) {
+                continue;
+            }
+            if (pos >= p.getMin() && pos <= p.getMax()){
+                currentLiftPosition = p;
+            }
+
+        }
+        // SLOT 5: the for loop over LiftPosition.values()
+        //         inside it: skip UNKNOWN, then the range test (the && line)
+        //         inside the range test: set currentLiftPosition
     }
 }
